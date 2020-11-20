@@ -51,6 +51,9 @@ public class HuffmanTest
 
 //    queue is empty
     Assertions.assertEquals(0, queue.size());
+
+    System.out.println(h.header);
+    Assertions.assertEquals("\u0001:a2:b3:c1:d1\u0002", h.header.toString());
   }
 
   @Test
@@ -148,5 +151,64 @@ public class HuffmanTest
   public void compressTest()
   {
     System.out.println(h.compress("aabbbcd".toCharArray()));
+  }
+
+  @Test
+  public void parseHeaderAsFrequencyTest()
+  {
+    char[] c = "\u0001:a2:b3:c1:d1\u00021010000110111".toCharArray();
+    int[] frequencies = h.parseHeaderAsFrequency(c);
+
+    Assertions.assertEquals(2, frequencies['a']);
+    Assertions.assertEquals(3, frequencies['b']);
+    Assertions.assertEquals(1, frequencies['c']);
+    Assertions.assertEquals(1, frequencies['d']);
+    Assertions.assertEquals(0, frequencies['x']);
+  }
+
+  @Test
+  public void isLeafTest()
+  {
+    HuffmanNode node1 = new HuffmanNode('a', 1);
+    HuffmanNode node2 = new HuffmanNode('b', 1);
+    HuffmanNode node3 = new HuffmanNode('c', 1);
+
+    node1.left = node2;
+    node1.right = node3;
+
+    Assertions.assertTrue(h.isLeaf(node2));
+    Assertions.assertTrue(h.isLeaf(node3));
+    Assertions.assertFalse(h.isLeaf(node1));
+    Assertions.assertFalse(h.isLeaf(null));
+  }
+
+  @Test
+  public void decodeStringTest()
+  {
+    // reset huffman
+    Huffman huffman = new Huffman();
+
+    char[] c = "\u0001:a2:b3:c1:d1\u00021010000110111".toCharArray();
+    int[] frequencies = h.parseHeaderAsFrequency(c);
+    PriorityQueue<HuffmanNode> queue = h.createPriorityQueue(frequencies);
+    HuffmanNode root = h.createHuffmanTree(queue);
+
+    String decoded = h.decodeString(c, root);
+
+    Assertions.assertEquals("aabbbcd", decoded);
+    Assertions.assertNotSame("", decoded);
+  }
+
+  @Test
+  public void decompressTest()
+  {
+//    reset huffman
+    Huffman huffman = new Huffman();
+
+    char[] c = "\u0001:a2:b3:c1:d1\u00021010000110111".toCharArray();
+
+    char[] decompressedCharArray = h.decompress(c);
+
+    Assertions.assertArrayEquals("aabbbcd".toCharArray(), decompressedCharArray);
   }
 }

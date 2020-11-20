@@ -9,7 +9,8 @@ import java.util.PriorityQueue;
  */
 public class Huffman
 {
-  public final int CHARACTER_LIMIT = 256;
+  final int CHARACTER_LIMIT = 256;
+  StringBuilder header = new StringBuilder();
 
   /**
    * the method to encode a string
@@ -24,9 +25,68 @@ public class Huffman
     PriorityQueue<HuffmanNode> queue = createPriorityQueue(frequencies);
     HuffmanNode root = createHuffmanTree(queue);
 
-    String compressed = encodeString(text, root);
 //    replace the string with the compressed bites
-    return compressed;
+    return header.toString() + encodeString(text, root);
+  }
+
+  /**
+   * Decodes the encodedText passed as a character array previously compressed by this algorithm
+   *
+   * @param encodedText as a char array
+   * @return array of decoded characters
+   */
+  public char[] decompress(char[] encodedText)
+  {
+    if (encodedText[0] != (char) 1) return null;
+    int[] frequencies = parseHeaderAsFrequency(encodedText);
+    PriorityQueue<HuffmanNode> queue = createPriorityQueue(frequencies);
+    HuffmanNode root = createHuffmanTree(queue);
+
+    String decompressed = decodeString(encodedText, root);
+
+    return decompressed.toCharArray();
+  }
+
+  /**
+   * parses the header to frequency table
+   * header starts with char 1 ands with char 2 from ASCII table
+   * and frequencies are separated by : when encoding
+   * \u0001:a2:b3:c1:d1\u0002 -> a.frequency = 2, b.frequenct = 3, etc
+   *
+   * @param text
+   * @return
+   */
+  public int[] parseHeaderAsFrequency(char[] text)
+  {
+    int[] frequencies = new int[CHARACTER_LIMIT];
+    int i = 0;
+
+    for (; i < text.length && text[i] != (char) 2; i++)
+    {
+      header.append(text[i]);
+
+      if (text[i] == ':')
+      {
+        i++;
+        header.append(text[i]);
+
+        int frequency = 0;
+        int multiplier = 1;
+        int j = i + 1;
+
+        for (; j < text.length && text[j] != (char) 2 && text[j] != ':'; j++)
+        {
+          frequency = (frequency * multiplier) + (text[j] - '0'); // - '0' so it will cast is as int
+          if (frequency != 0) multiplier = 10;
+          header.append(text[i] - '0');
+        }
+
+        frequencies[text[i]] = frequency;
+        i = j - 1; // because when we loop it will increase 1 more anyways
+      }
+    }
+
+    return frequencies;
   }
 
   public String encodeString(char[] text, HuffmanNode root)
@@ -44,6 +104,40 @@ public class Huffman
     }
 
     return sb.toString();
+  }
+
+  /**
+   * This method decodes the HuffmanCompression bits into characters
+   *
+   * @param text
+   * @param root
+   * @return
+   */
+  public String decodeString(char[] text, HuffmanNode root)
+  {
+    StringBuilder sb = new StringBuilder();
+
+    HuffmanNode current = root;
+    for (int i = header.length(); i < text.length; i++)
+    {
+      if (text[i] - '0' == 0) current = current.left;
+      else if (text[i] - '0' == 1) current = current.right;
+
+      if (isLeaf(current))
+      {
+//        it is a leaf so assign the character of that bnode
+        sb.append(current.c);
+//        reset the root
+        current = root;
+      }
+    }
+    return sb.toString();
+  }
+
+  public boolean isLeaf(HuffmanNode node)
+  {
+    if (node == null) return false;
+    return node.left == null && node.right == null;
   }
 
   public void generateBytes(String[] array, HuffmanNode root, StringBuilder sb)
@@ -91,6 +185,11 @@ public class Huffman
    */
   public PriorityQueue<HuffmanNode> createPriorityQueue(int[] frequencies)
   {
+    header = new StringBuilder();
+
+//    char to indicate the beginning the of the header
+    header.append((char) 1);
+
     PriorityQueue<HuffmanNode> queue = new PriorityQueue<>(1, new FrequencyComparator());
 
     for (int i = 0; i < frequencies.length; i++)
@@ -98,8 +197,12 @@ public class Huffman
       if (frequencies[i] > 0)
       {
         queue.add(new HuffmanNode((char) i, frequencies[i]));
+        header.append(":").append((char) i).append(frequencies[i]);
       }
     }
+
+//    char to indicate the end the of the header
+    header.append((char) 2);
 
     return queue;
   }
