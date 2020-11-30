@@ -103,6 +103,7 @@ public class TarjanSccAdjacencyList
       {
         visited[node] = false;
         sccs[node] = sccCount;
+        low[node] = ids[current];
         if (node == current) break;
 
         sccCount++;
