@@ -1,4 +1,4 @@
-package org.aybarsacar.advancedAlgorithms.graphs;
+package org.aybarsacar.advancedAlgorithms.graphtheory;
 
 import org.junit.jupiter.api.Test;
 
