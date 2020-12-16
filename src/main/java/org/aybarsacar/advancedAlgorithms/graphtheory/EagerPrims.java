@@ -35,14 +35,17 @@ public class EagerPrims
     }
   }
 
+  //  inputs
   private final int n; // size of the graph
   private final List<List<Edge>> graph;
 
-  private boolean mstExists;
+  //  internal
   private boolean solved;
+  private boolean mstExists;
   private boolean[] visited;
   private MinIndexedDHeap<Edge> ipq;
 
+  //  output
   private long minCostSum;
   private Edge[] mstEdges; // result
 
@@ -84,6 +87,7 @@ public class EagerPrims
 //      skip edges pointing to already visited nodes
       if (visited[destNodeIndex]) continue;
 
+//      Relaxation
       if (ipq.contains(destNodeIndex))
       {
 //        try and improve the cheapest edge at destNodeIndex with the current edge in the IPQ
@@ -92,7 +96,7 @@ public class EagerPrims
       else
       {
 //        insert edge for the first time
-        ipq.increase(destNodeIndex, edge);
+        ipq.insert(destNodeIndex, edge);
       }
     }
   }
@@ -105,6 +109,8 @@ public class EagerPrims
     if (solved) return;
     solved = true;
 
+//    n is the number of edges in the min spanning tree
+//    edge count is the number of edges we currently included in the mst so far
     int m = n - 1, edgeCount = 0;
     visited = new boolean[n];
     mstEdges = new Edge[m];
@@ -202,7 +208,7 @@ public class EagerPrims
       System.out.println("MST cost: " + cost);
       for (Edge e : solver.getMst())
       {
-        System.out.println(String.format("from: %d, to: %d, cost: %d", e.from, e.to, e.cost));
+        System.out.printf("from: %d, to: %d, cost: %d%n", e.from, e.to, e.cost);
       }
     }
 
