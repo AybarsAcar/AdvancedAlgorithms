@@ -1,4 +1,4 @@
-package org.aybarsacar;
+package org.aybarsacar.advancedAlgorithms.graphtheory;
 
 import java.util.ArrayList;
 import java.util.List;
