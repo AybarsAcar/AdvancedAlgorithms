@@ -4,11 +4,12 @@ public class FibonacciSolver
 {
   /**
    * iterative implementation with memoization
+   * bottom up approach
    *
    * @param n
    * @return
    */
-  public static int fib(int n)
+  public int fib(int n)
   {
     int[] result = new int[n + 1];
     result[0] = 0;
@@ -23,12 +24,13 @@ public class FibonacciSolver
   }
 
   /**
-   * seems more memory efficient
+   * more memory efficient
+   * bottom up approach
    *
    * @param n
    * @return
    */
-  public static int fibM(int n)
+  public int fibM(int n)
   {
     if (n == 0) return 0;
     if (n == 1) return 1;
@@ -53,7 +55,7 @@ public class FibonacciSolver
    * @param n
    * @return
    */
-  public static int fibBAD(int n)
+  public int fibBAD(int n)
   {
     if (n == 0) return 0;
     if (n == 1) return 1;
@@ -65,7 +67,9 @@ public class FibonacciSolver
 
   public static void main(String[] args)
   {
-    System.out.println(fib(75));
-    System.out.println(fibM(75));
+    FibonacciSolver solver = new FibonacciSolver();
+
+    System.out.println(solver.fib(75));
+    System.out.println(solver.fibM(75));
   }
 }
